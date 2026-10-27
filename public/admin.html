@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎛️ Panel de Control - Podcast El Confesionario</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="/socket.io/socket.io.js"></script>
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: #09030e;
+      color: #e2d9eb;
+      padding: 24px;
+      margin: 0;
+    }
+    .admin-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #ff007f;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .card {
+      background: #170720;
+      border: 1px solid rgba(157, 78, 221, 0.35);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    input {
+      background: #0d0314;
+      border: 1px solid #4a1d63;
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      flex: 1;
+      font-family: inherit;
+    }
+    button {
+      background: #ff007f;
+      color: #fff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+    button:hover { filter: brightness(1.15); transform: translateY(-1px); }
+    button.btn-purple { background: #9d4edd; }
+    button.btn-blue { background: #00f0ff; color: #000; }
+    button.btn-green { background: #00ff88; color: #000; }
+    button.btn-gray { background: #372b44; }
+    .badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+    .badge-offline { background: #30173d; color: #a192b0; }
+    .badge-online { background: #00ff88; color: #000; }
+    .stream-link-box {
+      background: #250936;
+      padding: 14px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #7b2cbf;
+    }
+    a { color: #00f0ff; text-decoration: none; font-weight: 800; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <div class="admin-container">
+    <h1>🎙️ Control del Podcast: El Confesionario</h1>
+
+    <!-- ENLACE A LA PANTALLA DE EMISIÓN -->
+    <div class="card">
+      <div class="card-title">📺 Pantalla del Stream (Para TikTok Live Studio / OBS)</div>
+      <div class="stream-link-box">
+        <div>
+          <span>URL Local: </span>
+          <a href="/" target="_blank">http://localhost:3000</a>
+        </div>
+        <button class="btn-blue" onclick="window.open('/', '_blank')">Abrir en Nueva Pestaña ↗</button>
+      </div>
+    </div>
+
+    <!-- CONTROL DEL PODCAST -->
+    <div class="card">
+      <div class="card-title">⏭️ Control del Podcast & Historias</div>
+      <p style="font-size: 0.88rem; color: #bca8cf; margin-bottom: 14px;">
+        Las historias se leen automáticamente con la voz sensual de Salomé. Puedes pasar a la siguiente historia cuando desees.
+      </p>
+      <button class="btn-purple" onclick="nextStory()" style="font-size: 1.05rem; padding: 12px 24px;">
+        ⏭️ Pasar al Siguiente Episodio / Historia
+      </button>
+    </div>
+
+    <!-- CONEXIÓN TIKTOK LIVE -->
+    <div class="card">
+      <div class="card-title">
+        <span>📡 Conexión a TikTok Live</span>
+        <span id="tiktokBadge" class="badge badge-offline">Desconectado</span>
+      </div>
+      <div class="input-group">
+        <input type="text" id="tiktokUserInput" placeholder="@usuario_tiktok" value="senseidelamor">
+        <button class="btn-green" onclick="connectTikTok()">Conectar Live</button>
+      </div>
+      <div id="tiktokInfo" style="font-size: 0.85rem; color: #a088b8;">
+        Conectando automáticamente a @senseidelamor...
+      </div>
+    </div>
+
+    <!-- SIMULADOR DE COMENTARIOS Y SECRETOS -->
+    <div class="card">
+      <div class="card-title">💬 Simulador de Comentarios de Oyentes</div>
+      <div class="input-group">
+        <input type="text" id="simUser" placeholder="Nombre oyente" value="Lucia_22" style="max-width: 150px;">
+        <input type="text" id="simComment" placeholder="Escribe un consejo o '!secreto ...'">
+        <button onclick="sendSimComment()">Enviar</button>
+      </div>
+      <div style="display: flex; gap: 8px; margin-top: 8px;">
+        <button class="btn-gray" onclick="quickComment('¡Termina con él ya mismo, es una red flag!')">Consejo 1</button>
+        <button class="btn-gray" onclick="quickComment('Yo creo que deberías hablarlo antes de juzgar.')">Consejo 2</button>
+        <button class="btn-purple" onclick="quickSecret()">Enviar Secreto Anónimo 💌</button>
+        <button class="btn-green" onclick="sendSimGift()">Simular Rosa 🌹</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const socket = io();
+
+    function nextStory() {
+      socket.emit('admin:next_story');
+    }
+
+    function connectTikTok() {
+      const user = document.getElementById('tiktokUserInput').value.trim();
+      socket.emit('admin:connect_tiktok', { username: user });
+    }
+
+    function sendSimComment() {
+      const user = document.getElementById('simUser').value.trim();
+      const comment = document.getElementById('simComment').value.trim();
+      if (!comment) return;
+      socket.emit('admin:sim_comment', { username: user, comment: comment });
+      document.getElementById('simComment').value = '';
+    }
+
+    function quickComment(text) {
+      const user = document.getElementById('simUser').value.trim();
+      socket.emit('admin:sim_comment', { username: user, comment: text });
+    }
+
+    function quickSecret() {
+      const user = document.getElementById('simUser').value.trim();
+      socket.emit('admin:sim_comment', {
+        username: user,
+        comment: '!secreto Mi pareja me dijo que iba a dormir temprano y lo vi activo en línea hasta las 4 AM.'
+      });
+    }
+
+    function sendSimGift() {
+      const user = document.getElementById('simUser').value.trim();
+      socket.emit('admin:sim_gift', { username: user, giftName: 'Rosa 🌹', diamonds: 1 });
+    }
+
+    socket.on('tiktok_status', data => {
+      const badge = document.getElementById('tiktokBadge');
+      const info = document.getElementById('tiktokInfo');
+      if (data.connected) {
+        badge.className = 'badge badge-online';
+        badge.textContent = 'En Vivo Conectado ✅';
+        info.innerHTML = `Conectado al directo de <strong>@${data.user}</strong> (RoomId: ${data.roomId || 'Activo'})`;
+      } else {
+        badge.className = 'badge badge-offline';
+        badge.textContent = 'Desconectado';
+        info.textContent = data.error ? `Error: ${data.error}` : 'Desconectado';
+      }
+    });
+
+    socket.on('podcast_sync', state => {
+      if (state.tiktokConnected) {
+        document.getElementById('tiktokBadge').className = 'badge badge-online';
+        document.getElementById('tiktokBadge').textContent = 'En Vivo Conectado ✅';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,578 @@
+:root {
+  --bg-dark: #08020c;
+  --bg-card: rgba(23, 7, 30, 0.94);
+  --bg-reflection: rgba(43, 11, 56, 0.9);
+  --pink: #ff007f;
+  --pink-glow: rgba(255, 0, 127, 0.35);
+  --purple: #9d4edd;
+  --purple-glow: rgba(157, 78, 221, 0.3);
+  --gold: #ffbe0b;
+  --cyan: #00f0ff;
+  --text-white: #ffffff;
+  --text-soft: #f3e8f8;
+  --text-dim: #b8a3c7;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+body.podcast-theme {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: var(--bg-dark);
+  color: var(--text-white);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  overflow: hidden;
+}
+
+.particle-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* ========================================================
+   CONTENEDOR 9:16 VERTICAL DE PODCAST (TIKTOK LIVE)
+   ======================================================== */
+.podcast-container {
+  width: 100%;
+  max-width: 500px;
+  height: 100%;
+  max-height: 940px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 18px 16px;
+  background: radial-gradient(circle at 50% 8%, #280733 0%, #0d0214 60%, #050109 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ========================================================
+   CABECERA PRINCIPAL (100% MARCA PODCAST)
+   ======================================================== */
+.podcast-header {
+  margin-bottom: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.marathon-pill-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(90deg, rgba(255, 107, 0, 0.25), rgba(255, 0, 127, 0.3), rgba(255, 107, 0, 0.25));
+  border: 1.5px solid #ff6b00;
+  padding: 5px 12px;
+  border-radius: 20px;
+  box-shadow: 0 0 16px rgba(255, 107, 0, 0.4);
+}
+
+.fire-pulse {
+  font-size: 0.95rem;
+  animation: fire-flicker 1.5s infinite alternate ease-in-out;
+}
+
+@keyframes fire-flicker {
+  0% { transform: scale(1); filter: drop-shadow(0 0 2px #ff6b00); }
+  100% { transform: scale(1.3); filter: drop-shadow(0 0 8px #ff007f); }
+}
+
+.marathon-title {
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #ffe8cc;
+  text-transform: uppercase;
+  text-shadow: 0 0 8px rgba(255, 107, 0, 0.6);
+}
+
+.counter-pill {
+  background: rgba(255, 190, 11, 0.18);
+  border: 1px solid var(--gold);
+  color: #ffe699;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+  box-shadow: 0 0 10px rgba(255, 190, 11, 0.3);
+}
+
+.podcast-brand {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(157, 78, 221, 0.25);
+}
+
+.brand-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.live-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 0, 80, 0.25);
+  border: 1px solid rgba(255, 0, 80, 0.7);
+  padding: 4px 10px;
+  border-radius: 14px;
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  background: #ff0050;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #ff0050;
+  animation: pulse-live 1.3s infinite ease-in-out;
+}
+
+@keyframes pulse-live {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.35); opacity: 0.45; }
+}
+
+.live-label {
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+  color: #ffb3c6;
+}
+
+.podcast-title {
+  font-size: 0.95rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 0, 127, 0.4);
+}
+
+.sound-toggle-btn {
+  background: rgba(157, 78, 221, 0.25);
+  border: 1px solid var(--purple);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sound-toggle-btn:hover {
+  background: rgba(157, 78, 221, 0.45);
+}
+
+.sound-toggle-btn.muted {
+  background: rgba(255, 0, 80, 0.25);
+  border-color: #ff0050;
+  color: #ffb3c6;
+}
+
+.podcast-tagline {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #c4b5fd;
+}
+
+/* ========================================================
+   ESTUDIO Y ONDAS DE SONIDO REACTIVAS
+   ======================================================== */
+.studio-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.voice-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #ffd166;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.mic-icon {
+  font-size: 1.15rem;
+  animation: mic-bob 2.2s infinite ease-in-out;
+}
+
+@keyframes mic-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.sound-waves {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 36px;
+  width: 100%;
+  padding: 0 20px;
+}
+
+.wave-bar {
+  flex: 1;
+  max-width: 6px;
+  height: 8px;
+  background: linear-gradient(180deg, #ff007f, #9d4edd);
+  border-radius: 4px;
+  box-shadow: 0 0 8px rgba(255, 0, 127, 0.4);
+  transition: height 0.12s ease;
+}
+
+.sound-waves.active .wave-bar {
+  animation: wave-beat 0.7s infinite ease-in-out alternate;
+}
+
+.sound-waves.active .wave-bar:nth-child(2n) { animation-duration: 0.5s; animation-delay: 0.1s; }
+.sound-waves.active .wave-bar:nth-child(3n) { animation-duration: 0.85s; animation-delay: 0.2s; }
+.sound-waves.active .wave-bar:nth-child(4n) { animation-duration: 0.6s; animation-delay: 0.3s; }
+
+@keyframes wave-beat {
+  0% { height: 7px; }
+  100% { height: 35px; }
+}
+
+/* ========================================================
+   BARRA DE META DE DONACIONES & BENEFICIO VIP
+   ======================================================== */
+.goal-container {
+  background: rgba(255, 0, 127, 0.08);
+  border: 1px solid rgba(255, 0, 127, 0.35);
+  border-radius: 14px;
+  padding: 8px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  box-shadow: 0 0 14px rgba(255, 0, 127, 0.15);
+}
+
+.goal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.goal-title {
+  font-size: 0.74rem;
+  font-weight: 900;
+  color: #ff9ebb;
+  letter-spacing: 0.8px;
+}
+
+.vip-tag {
+  background: linear-gradient(90deg, #ffbe0b, #ff007f);
+  color: #000;
+  font-size: 0.65rem;
+  font-weight: 900;
+  padding: 2px 8px;
+  border-radius: 10px;
+  letter-spacing: 0.5px;
+}
+
+.goal-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.goal-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff007f, #ffbe0b);
+  border-radius: 6px;
+  box-shadow: 0 0 8px #ff007f;
+  transition: width 0.4s ease-out;
+}
+
+.vip-callout {
+  font-size: 0.68rem;
+  color: #f7d6e6;
+  text-align: center;
+}
+
+.vip-callout strong {
+  color: #ffbe0b;
+}
+
+/* ========================================================
+   TARJETA PRINCIPAL DE LECTURA DE LA CONFESIÓN
+   ======================================================== */
+.story-card {
+  background: var(--bg-card);
+  border: 1.5px solid rgba(255, 0, 127, 0.4);
+  border-radius: 20px;
+  padding: 18px 20px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), 0 0 22px rgba(157, 78, 221, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.story-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.category-pill {
+  background: rgba(255, 0, 127, 0.25);
+  border: 1px solid var(--pink);
+  color: #ff9ebb;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.anonymous-pill {
+  font-size: 0.7rem;
+  color: #c4b5fd;
+  font-weight: 700;
+}
+
+.story-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #ffffff;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.story-body {
+  position: relative;
+  background: rgba(0, 0, 0, 0.38);
+  border-radius: 14px;
+  padding: 14px 18px;
+  border-left: 3.5px solid var(--pink);
+  max-height: 190px;
+  overflow-y: auto;
+}
+
+.quote-mark {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.8rem;
+  line-height: 1;
+  color: var(--pink);
+  opacity: 0.7;
+}
+
+.end-quote {
+  float: right;
+}
+
+.story-text {
+  font-size: 0.96rem;
+  line-height: 1.5;
+  color: var(--text-soft);
+  font-weight: 500;
+  margin: 4px 0;
+}
+
+/* CAJA DE REFLEXIÓN / PREGUNTA PARA EL CHAT */
+.reflection-box {
+  background: var(--bg-reflection);
+  border: 1.5px solid var(--gold);
+  border-radius: 14px;
+  padding: 12px 16px;
+  box-shadow: 0 0 15px rgba(255, 190, 11, 0.2);
+}
+
+.reflection-header {
+  font-size: 0.72rem;
+  font-weight: 900;
+  color: var(--gold);
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.reflection-question {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.35;
+}
+
+/* ========================================================
+   MURO DE OPINIONES DE LOS OYENTES EN TIKTOK
+   ======================================================== */
+.comments-section {
+  background: rgba(18, 5, 24, 0.88);
+  border: 1px solid rgba(157, 78, 221, 0.35);
+  border-radius: 18px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 200px;
+}
+
+.comments-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.comments-title {
+  font-size: 0.72rem;
+  font-weight: 900;
+  color: var(--cyan);
+  letter-spacing: 0.8px;
+}
+
+.comments-hint {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+}
+
+.comments-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  overflow-y: hidden;
+  max-height: 155px;
+}
+
+.comment-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 7px 12px;
+  animation: pop-comment 0.35s ease-out;
+}
+
+@keyframes pop-comment {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.comment-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1.5px solid var(--purple);
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.comment-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.comment-user {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #ffd166;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.comment-text {
+  font-size: 0.85rem;
+  line-height: 1.25;
+  color: #ffffff;
+  word-break: break-word;
+}
+
+.comment-placeholder {
+  font-size: 0.78rem;
+  color: #8c7899;
+  text-align: center;
+  padding: 16px 8px;
+  line-height: 1.45;
+}
+
+/* ========================================================
+   PIE Y ALERTAS
+   ======================================================== */
+.podcast-footer {
+  text-align: center;
+  font-size: 0.74rem;
+  color: #d8c9e6;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 9px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.podcast-footer strong {
+  color: #ff9ebb;
+}
+
+.secret-alert {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, #ff007f, #9d4edd);
+  color: #fff;
+  padding: 8px 20px;
+  border-radius: 25px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(255, 0, 127, 0.6);
+  animation: pop-alert 0.4s ease-out;
+}
+
+@keyframes pop-alert {
+  0% { transform: translateX(-50%) scale(0.7); opacity: 0; }
+  100% { transform: translateX(-50%) scale(1); opacity: 1; }
+}
+
+.hidden {
+  display: none !important;
+}
+
+.unmute-btn {
+  position: fixed;
+  bottom: 25px;
+  background: #ff007f;
+  color: #fff;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(255, 0, 127, 0.8);
+  z-index: 1000;
+}

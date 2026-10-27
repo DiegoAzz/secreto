@@ -1,0 +1,142 @@
+[
+  {
+    "id": 1,
+    "category": "💔 ¿Infidelidad o No?",
+    "question": "Tu pareja le da 'Me encanta' a todas las fotos viejas de su ex a las 2:00 AM. ¿Qué es esto?",
+    "options": [
+      { "key": "A", "text": "Infidelidad emocional directa" },
+      { "key": "B", "text": "Solo nostalgia inocente" },
+      { "key": "C", "text": "Una Red Flag del tamaño de Rusia" },
+      { "key": "D", "text": "Nada grave, déjale su espacio" }
+    ],
+    "correct": "C",
+    "aliases": ["c", "red flag", "bandera roja", "una red flag"],
+    "hint": "Cruza los límites del respeto y demuestra que aún no ha cerrado el ciclo."
+  },
+  {
+    "id": 2,
+    "category": "🚩 Red Flags Tóxicas",
+    "question": "Llevan 2 semanas saliendo y te dice: 'Todas mis ex estaban locas'. La psicología dice que:",
+    "options": [
+      { "key": "A", "text": "Él/Ella es la persona tóxica" },
+      { "key": "B", "text": "Simplemente ha tenido mala suerte" },
+      { "key": "C", "text": "Te está advirtiendo su futuro contigo" },
+      { "key": "D", "text": "A y C son correctas (¡Corre!)" }
+    ],
+    "correct": "D",
+    "aliases": ["d", "a y c", "corre", "todas"],
+    "hint": "Quien no asume su parte de culpa en relaciones pasadas, repetirá el patrón contigo."
+  },
+  {
+    "id": 3,
+    "category": "📱 Celulares & Secretos",
+    "question": "Tu pareja voltea la pantalla del celular boca abajo cada vez que te sientas a su lado. ¿Motivo?",
+    "options": [
+      { "key": "A", "text": "Oculta notificaciones que no debes ver" },
+      { "key": "B", "text": "Para ahorrar batería y cuidar la pantalla" },
+      { "key": "C", "text": "Costumbre normal sin importancia" },
+      { "key": "D", "text": "Para concentrarse al 100% en ti" }
+    ],
+    "correct": "A",
+    "aliases": ["a", "oculta", "oculta notificaciones"],
+    "hint": "El cambio repentino de postura con el móvil es la señal #1 de secretos."
+  },
+  {
+    "id": 4,
+    "category": "😏 Seducción & Psicología",
+    "question": "¿Cuál es el mejor momento para responderle un mensaje a la persona que te gusta?",
+    "options": [
+      { "key": "A", "text": "Al segundo exacto para mostrar interés" },
+      { "key": "B", "text": "Esperar exactamente 3 días (la vieja regla)" },
+      { "key": "C", "text": "Tiempos variables (muestra vida propia)" },
+      { "key": "D", "text": "Dejar en visto hasta el día siguiente" }
+    ],
+    "correct": "C",
+    "aliases": ["c", "variable", "tiempos variables"],
+    "hint": "La recompensa intermitente es el truco psicológico que más engancha."
+  },
+  {
+    "id": 5,
+    "category": "👀 Micro-Infidelidad",
+    "question": "¿Borrar conversaciones de WhatsApp con un 'amigo/a' de confianza se considera traición?",
+    "options": [
+      { "key": "A", "text": "Sí, si no hubiera nada malo no se borra" },
+      { "key": "B", "text": "No, es para evitar celos tontos" },
+      { "key": "C", "text": "Solo si había fotos picantes" },
+      { "key": "D", "text": "Depende si hablan de trabajo" }
+    ],
+    "correct": "A",
+    "aliases": ["a", "si", "sí", "si se borra"],
+    "hint": "Si tienes que ocultarlo o borrarlo de tu pareja, ya cruzaste la línea."
+  },
+  {
+    "id": 6,
+    "category": "🍽️ Primera Cita",
+    "question": "En la primera cita, la persona trata muy grosero al camarero o mesero. ¿Qué significa?",
+    "options": [
+      { "key": "A", "text": "Tuvo un mal día, merece otra oportunidad" },
+      { "key": "B", "text": "Así mismo te tratará a ti en 6 meses" },
+      { "key": "C", "text": "Es alguien de carácter fuerte y dominante" },
+      { "key": "D", "text": "Es exigente con la buena comida" }
+    ],
+    "correct": "B",
+    "aliases": ["b", "asi te tratara", "asi mismo"],
+    "hint": "El test del camarero nunca falla: revela la verdadera empatía de alguien."
+  },
+  {
+    "id": 7,
+    "category": "💔 Ex Parejas",
+    "question": "Tu pareja sigue siendo 'mejor amigo/a' de su ex novio/a de toda la vida. ¿Tu reacción?",
+    "options": [
+      { "key": "A", "text": "Madurez total, hay que confiar a ciegas" },
+      { "key": "B", "text": "Donde hubo fuego, cenizas quedan" },
+      { "key": "C", "text": "Poner límites claros de respeto mutuo" },
+      { "key": "D", "text": "B y C son la cruda realidad" }
+    ],
+    "correct": "D",
+    "aliases": ["d", "b y c", "cenizas", "limites"],
+    "hint": "Sin límites firmes, el pasado suele volver a encenderse."
+  },
+  {
+    "id": 8,
+    "category": "🔥 Seducción & Química",
+    "question": "¿Qué lenguaje corporal demuestra que alguien siente atracción magnética por ti?",
+    "options": [
+      { "key": "A", "text": "Brazos cruzados y mirada fija al suelo" },
+      { "key": "B", "text": "Pupilas dilatadas y se inclina hacia ti" },
+      { "key": "C", "text": "Bosteza y mira el reloj constantemente" },
+      { "key": "D", "text": "Se aleja cada vez que te acercas" }
+    ],
+    "correct": "B",
+    "aliases": ["b", "pupilas", "se inclina", "pupilas dilatadas"],
+    "hint": "Los ojos y la proximidad física inconsciente son involuntarios cuando hay deseo."
+  },
+  {
+    "id": 9,
+    "category": "🕵️ Señales de Alerta",
+    "question": "De repente tu pareja se perfuma para ir al supermercado y cuida el gym como nunca. ¿Probabilidad?",
+    "options": [
+      { "key": "A", "text": "Crisis de los 30 años" },
+      { "key": "B", "text": "Hay alguien nuevo llamando su atención" },
+      { "key": "C", "text": "Amor propio repentino" },
+      { "key": "D", "text": "Vio un video de superación personal" }
+    ],
+    "correct": "B",
+    "aliases": ["b", "alguien nuevo", "nuevo"],
+    "hint": "El cambio radical de estética personal repentina suele tener un destinatario."
+  },
+  {
+    "id": 10,
+    "category": "❤️ Amor Verdadero",
+    "question": "¿Cuál es el pilar más importante que sostiene a una pareja a largo plazo?",
+    "options": [
+      { "key": "A", "text": "Pasión intensa en la cama únicamente" },
+      { "key": "B", "text": "Confianza, comunicación y admiración mutua" },
+      { "key": "C", "text": "Mucho dinero y regalos caros" },
+      { "key": "D", "text": "No discutir nunca por nada" }
+    ],
+    "correct": "B",
+    "aliases": ["b", "confianza", "comunicacion"],
+    "hint": "La pasión sube y baja, pero el respeto y la confianza lo sostienen todo."
+  }
+]

@@ -1,0 +1,11 @@
+node_modules/
+.env
+.env.local
+public/audio/*.mp3
+test_*.js
+*.log
+tusecreto_sample.html
+check_tusecreto_stats.js
+scrape_check.js
+.DS_Store
+Thumbs.db

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎙️ El Confesionario - Maratón de Secretos Anónimos</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,600;1,700&family=Orbitron:wght@800;900&display=swap" rel="stylesheet">
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body class="podcast-theme">
+
+  <!-- Partículas de ambiente nocturno -->
+  <div id="particleContainer" class="particle-container"></div>
+
+  <!-- Alerta flotante cuando un oyente envía un secreto -->
+  <div id="secretAlert" class="secret-alert hidden">
+    <span class="alert-icon">💌</span>
+    <span id="secretAlertText">¡Secreto recibido! Se leerá en la maratón</span>
+  </div>
+
+  <!-- Contenedor Principal en Formato Vertical 9:16 para TikTok Live -->
+  <div class="podcast-container">
+    
+    <!-- CABECERA PRINCIPAL: MARATÓN Y MARCA -->
+    <header class="podcast-header">
+      <div class="marathon-pill-banner">
+        <span class="fire-pulse">🔥</span>
+        <span class="marathon-title">MARATÓN HISTÓRICA • DESDE EL SECRETO #1 HASTA HOY</span>
+        <span class="fire-pulse">🔥</span>
+      </div>
+
+      <div class="podcast-brand">
+        <div class="brand-left">
+          <div class="live-pill">
+            <span class="live-dot"></span>
+            <span class="live-label">EN VIVO</span>
+          </div>
+          <span class="podcast-title">EL CONFESIONARIO</span>
+        </div>
+        <div class="brand-right">
+          <button id="soundToggleBtn" class="sound-toggle-btn" title="Silenciar/Activar audio en esta ventana">🔊 Audio On</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ESTUDIO & VISUALIZADOR DE VOZ SENSUAL -->
+    <section class="studio-section">
+      <div class="voice-badge">
+        <span class="mic-icon">🎙️</span>
+        <span class="voice-label">VOZ SENSUAL EN DIRECTO</span>
+      </div>
+      <!-- Ondas de audio animadas reactivas -->
+      <div id="soundWaves" class="sound-waves">
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+      </div>
+    </section>
+
+    <!-- BARRA DE META DE DONACIONES & BENEFICIO VIP -->
+    <div class="goal-container">
+      <div class="goal-header">
+        <span class="goal-title">🎯 META: <strong id="roseCount">0</strong> / <span id="roseGoal">50</span> ROSAS 🌹</span>
+        <span class="vip-tag">👑 Pase VIP: 1 Rosa</span>
+      </div>
+      <div class="goal-track">
+        <div id="goalProgressBar" class="goal-fill" style="width: 0%;"></div>
+      </div>
+      <div class="vip-callout">
+        <span>✨ Envía <strong>1 Rosa 🌹</strong> para que la voz lea tu secreto de inmediato sin fila</span>
+      </div>
+    </div>
+
+    <!-- TARJETA DE LECTURA DE LA CONFESIÓN HISTÓRICA -->
+    <main class="story-card">
+      <div class="story-meta">
+        <span id="storyCategory" class="category-pill">🔥 SECRETO #1</span>
+        <span id="storyCounter" class="counter-pill">📜 SECRETO #1 DE 19,934</span>
+      </div>
+
+      <h1 id="storyTitle" class="story-title">
+        Cargando confesión histórica...
+      </h1>
+
+      <div class="story-body">
+        <span class="quote-mark">“</span>
+        <p id="storyText" class="story-text">
+          Conectando con el confesionario...
+        </p>
+        <span class="quote-mark end-quote">”</span>
+      </div>
+
+      <!-- ESPACIO DE REFLEXIÓN PARA LOS OYENTES -->
+      <div class="reflection-box">
+        <div class="reflection-header">
+          <span>💬 ¿QUÉ HUBIERAS HECHO EN SU LUGAR?</span>
+        </div>
+        <div id="debateQuestion" class="reflection-question">
+          Deja tu opinión o consejo en el chat 👇
+        </div>
+      </div>
+    </main>
+
+    <!-- MURO DE OPINIONES Y CONSEJOS EN VIVO DE TIKTOK -->
+    <section class="comments-section">
+      <div class="comments-header">
+        <span class="comments-title">📻 OPINIONES DE LOS OYENTES EN DIRECTO</span>
+        <span class="comments-hint">Comenta para salir en pantalla</span>
+      </div>
+      <div id="commentsFeed" class="comments-feed">
+        <div class="comment-placeholder">
+          Escribe tu consejo en el chat o envía tu secreto con <strong>!secreto [tu historia]</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- PIE INFORMATIVO Y LLAMADO A LA ACCIÓN -->
+    <footer class="podcast-footer">
+      <span>👆 <strong>Tap Tap</strong> a la pantalla | 🤫 Comenta <strong>!secreto [tu historia]</strong> para salir al aire</span>
+    </footer>
+
+  </div>
+
+  <!-- Botón flotante por si el navegador bloquea el audio inicial -->
+  <button id="unmuteBtn" class="unmute-btn hidden">
+    🔊 Toca aquí para escuchar la voz sensual
+  </button>
+
+  <script src="app.js"></script>
+</body>
+</html>
