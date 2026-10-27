@@ -288,6 +288,31 @@ io.on('connection', socket => {
     nextPodcastStory();
   });
 
+  socket.on('admin:send_custom_story', async data => {
+    if (!data || !data.text) return;
+    const customSecret = {
+      id: 'custom_' + Date.now(),
+      realSecretId: '⭐',
+      title: data.title || 'Confesión Exclusiva',
+      category: data.category || '🌟 Confesión Exclusiva',
+      text: data.text,
+      isCustom: true
+    };
+
+    console.log(`[Admin] ✍️ Historia propia recibida: "${customSecret.title}" (Inmediata: ${data.immediate})`);
+
+    if (data.immediate) {
+      const story = await podcastNarrator.createPodcastStory(customSecret);
+      podcastState.currentStory = story;
+      io.emit('new_podcast_story', story);
+      io.emit('podcast_sync', getPublicPodcastState());
+      if (podcastTimer) clearTimeout(podcastTimer);
+      podcastTimer = setTimeout(nextPodcastStory, 60000);
+    } else {
+      podcastState.userSecretsQueue.unshift(customSecret);
+    }
+  });
+
   socket.on('admin:connect_tiktok', data => connectTikTok(data.username));
 
   socket.on('admin:sim_comment', data => {

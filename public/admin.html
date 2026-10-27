@@ -111,6 +111,34 @@
       </div>
     </div>
 
+    <!-- TRANSMITIR HISTORIA PROPIA -->
+    <div class="card" style="border: 1.5px solid #ff007f;">
+      <div class="card-title">✍️ Locutar Mi Propia Historia / Confesión</div>
+      <p style="font-size: 0.88rem; color: #bca8cf; margin-bottom: 12px;">
+        Escribe cualquier historia que quieras transmitir. La voz sensual de Salomé la narrará en vivo con formato de podcast.
+      </p>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <input type="text" id="customTitle" placeholder="Título de tu historia (Ej: Lo que descubrí en su WhatsApp)">
+        <select id="customCategory" style="background: #0d0314; border: 1px solid #4a1d63; color: #fff; padding: 10px; border-radius: 8px; font-family: inherit;">
+          <option value="💔 Amor & Pareja">💔 Amor & Pareja</option>
+          <option value="💋 Amor Prohibido">💋 Amor Prohibido</option>
+          <option value="🚩 Red Flag">🚩 Red Flag</option>
+          <option value="🌧️ Desamor & Ruptura">🌧️ Desamor & Ruptura</option>
+          <option value="🤫 Confesión Exclusiva">🤫 Confesión Exclusiva</option>
+        </select>
+        <textarea id="customText" rows="4" placeholder="Escribe aquí el relato o secreto... (la voz sensual lo narrará)" style="background: #0d0314; border: 1px solid #4a1d63; color: #fff; padding: 12px; border-radius: 8px; font-family: inherit; font-size: 0.95rem; resize: vertical;"></textarea>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn-purple" onclick="sendCustomStory(true)" style="flex: 1; padding: 12px; font-size: 1rem;">
+            🎙️ Transmitir Ahora Mismo al Aire
+          </button>
+          <button class="btn-blue" onclick="sendCustomStory(false)" style="padding: 12px;">
+            📥 Poner de Siguiente en Fila
+          </button>
+        </div>
+        <div id="customStoryNotice" style="font-size: 0.88rem; color: #00ff88; display: none; font-weight: 700;"></div>
+      </div>
+    </div>
+
     <!-- CONTROL DEL PODCAST -->
     <div class="card">
       <div class="card-title">⏭️ Control del Podcast & Historias</div>
@@ -160,6 +188,30 @@
 
     function nextStory() {
       socket.emit('admin:next_story');
+    }
+
+    function sendCustomStory(immediate) {
+      const title = document.getElementById('customTitle').value.trim();
+      const category = document.getElementById('customCategory').value;
+      const text = document.getElementById('customText').value.trim();
+      const notice = document.getElementById('customStoryNotice');
+
+      if (!text) {
+        alert('Por favor escribe el texto de tu historia.');
+        return;
+      }
+
+      socket.emit('admin:send_custom_story', {
+        title: title || 'Confesión Exclusiva',
+        category: category,
+        text: text,
+        immediate: immediate
+      });
+
+      notice.style.display = 'block';
+      notice.textContent = immediate ? '🎙️ ¡Locutando tu historia al aire en este momento!' : '📥 ¡Tu historia quedó lista como la siguiente en transmitirse!';
+      document.getElementById('customText').value = '';
+      setTimeout(() => { notice.style.display = 'none'; }, 4500);
     }
 
     function connectTikTok() {

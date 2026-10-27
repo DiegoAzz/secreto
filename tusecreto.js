@@ -4,6 +4,7 @@ const path = require('path');
 
 const CACHE_FILE = path.join(__dirname, 'secrets_chronological_cache.json');
 const PROGRESS_FILE = path.join(__dirname, 'marathon_progress.json');
+const CUSTOM_STORIES_FILE = path.join(__dirname, 'mis_historias.json');
 
 // Cargar progreso persistente de la maratón
 function loadProgress() {
@@ -156,6 +157,25 @@ async function updateSecretsDatabase() {
   if (storiesList.length === 0) {
     const backup = await scrapeTusConfesionesFallback();
     if (backup.length > 0) storiesList = backup;
+  }
+
+  // Cargar historias propias si existen en mis_historias.json
+  if (fs.existsSync(CUSTOM_STORIES_FILE)) {
+    try {
+      const myStories = JSON.parse(fs.readFileSync(CUSTOM_STORIES_FILE, 'utf-8'));
+      if (Array.isArray(myStories) && myStories.length > 0) {
+        const formattedMyStories = myStories.map((s, idx) => ({
+          id: 'propia_' + (idx + 1),
+          title: s.title || 'Confesión Exclusiva',
+          category: s.category || '🌟 Confesión Propia',
+          text: s.text,
+          isCustom: true
+        }));
+        console.log(`[TuSecreto] ✨ Cargadas ${formattedMyStories.length} historias propias de mis_historias.json`);
+        // Las colocamos al inicio de la lista
+        storiesList = [...formattedMyStories, ...storiesList];
+      }
+    } catch (e) {}
   }
 
   console.log(`[TuSecreto] 🔥 ¡Base activa con ${storiesList.length} historias (En curso: #${currentIndex + 1})!`);
