@@ -4,20 +4,35 @@ require('dotenv').config();
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 
+// Obtener la hora exacta de Colombia / Latinoamérica (independiente de si el servidor corre en UTC)
+function getLocalHour() {
+  try {
+    const tz = process.env.TIMEZONE || 'America/Bogota';
+    const formatter = new Intl.DateTimeFormat('es-CO', {
+      timeZone: tz,
+      hour: 'numeric',
+      hour12: false
+    });
+    return parseInt(formatter.format(new Date()), 10);
+  } catch (e) {
+    return new Date().getHours();
+  }
+}
+
 // Calcula el saludo adecuado según la hora real del día
 function getGreetingInfo() {
-  const hour = new Date().getHours();
+  const hour = getLocalHour();
   if (hour >= 5 && hour < 12) {
     return {
       saludo: 'Buenos días',
       momento: 'esta mañana',
-      regla: 'El programa se emite POR LA MAÑANA (hora local: entre 5 AM y 12 PM). Si usas un saludo de bienvenida, di OBLIGATORIAMENTE "Buenos días" o "en esta mañana". ESTÁ PROHIBIDO decir "Buenas noches" o "esta noche".'
+      regla: 'El programa se emite POR LA MAÑANA (hora local: entre 5 AM y 12 PM). Tu saludo OBLIGATORIO es "Buenos días" o "en esta mañana". ESTÁ ESTRICTAMENTE PROHIBIDO decir "Buenas noches", "esta noche" o "nocturno".'
     };
   } else if (hour >= 12 && hour < 19) {
     return {
       saludo: 'Buenas tardes',
       momento: 'esta tarde',
-      regla: 'El programa se emite POR LA TARDE (hora local: entre 12 PM y 7 PM). Si usas un saludo de bienvenida, di OBLIGATORIAMENTE "Buenas tardes" o "en esta tarde". ESTÁ PROHIBIDO decir "Buenas noches" o "esta noche".'
+      regla: 'El programa se emite POR LA TARDE (hora local: entre 12 PM y 7 PM). Tu saludo OBLIGATORIO es "Buenas tardes" o "en esta tarde". ESTÁ ESTRICTAMENTE PROHIBIDO decir "Buenas noches", "esta noche" o "nocturno".'
     };
   } else {
     return {
@@ -42,18 +57,18 @@ async function createPodcastStory(rawSecret) {
 
   if (GEMINI_API_KEY) {
     const prompt = `
-Eres la narradora y psicóloga de "El Confesionario", un podcast nocturno íntimo, sensual y profundamente adictivo en TikTok Live.
+Eres la narradora y psicóloga de "El Confesionario", un podcast de confesiones íntimas, sensual y profundamente adictivo en TikTok Live.
 Estamos en la GRAN MARATÓN: Leyendo los secretos de TuSecreto.me desde el SECRETO NÚMERO 1 hasta el presente.
 
 ESTE ES EL SECRETO NÚMERO: #${secretId}
-HORA ACTUAL Y SALUDO: ${timeInfo.regla}
+HORA ACTUAL Y SALUDO OBLIGATORIO: ${timeInfo.regla}
 
-Tu objetivo es hacer que los espectadores de TikTok Live se queden HIPNOTIZADOS escuchando, sin poder salir del directo.
+Tu objetivo es hacer que los espectadores de TikTok Live se queden hipnotizados escuchando.
 Escribe:
 1. "narration": Un guion para ser leído con tu voz sensual, pausada, intrigante y seductora.
-   - Comienza mencionando el número del secreto con misterio (ej: "${timeInfo.saludo}, bienvenidos a la maratón... Secreto número ${secretId} de la historia...").
+   - Comienza mencionando el número del secreto y el saludo adecuado al horario ("${timeInfo.saludo}, bienvenidos a la gran maratón... Secreto número ${secretId}...").
    - Cuenta la confesión en primera persona con emoción palpable, suspenso y ritmo envolvente. Corrige cualquier falta ortográfica o abreviatura para que la dicción sea perfecta.
-   - Termina con una pregunta psicológica irresistible que OBLIGUE al chat a comentar de inmediato.
+   - Termina con una pregunta psicológica irresistible que obligue al chat a comentar de inmediato.
 2. "cleanText": El texto de la confesión bien redactado y cautivador para la pantalla del celular (máximo 250 caracteres).
 3. "debateQuestion": Una pregunta provocadora y directa para el chat (máximo 85 caracteres).
 
@@ -76,7 +91,7 @@ Responde ÚNICAMENTE con un JSON válido sin formato markdown ni código:
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            temperature: 0.92,
+            temperature: 0.9,
             maxOutputTokens: 600
           }
         })
@@ -101,9 +116,26 @@ Responde ÚNICAMENTE con un JSON válido sin formato markdown ni código:
     }
   }
 
-  // Fallback directo si no responde la API
+  // Fallback si no responde la API
   if (!scriptNarration) {
-    scriptNarration = `${timeInfo.saludo}... Continuamos con la gran maratón. Secreto número ${secretId} de la historia. "${storyText}". Y ahora les pregunto a ustedes en el chat... ¿Qué opinan? ¿Qué hubieran hecho en su lugar? Los leo en directo.`;
+    scriptNarration = `${timeInfo.saludo}... Continuamos con la gran maratón. Secreto número ${secretId}. "${storyText}". Y ahora les pregunto a ustedes en el chat... ¿Qué opinan? ¿Qué hubieran hecho en su lugar? Los leo en directo.`;
+  }
+
+  // Sanitización estricta por código (Garantía al 100% de que no diga "buenas noches" en la tarde)
+  if (timeInfo.saludo === 'Buenas tardes') {
+    scriptNarration = scriptNarration
+      .replace(/buenas noches/gi, 'buenas tardes')
+      .replace(/esta noche/gi, 'esta tarde')
+      .replace(/criaturas de la noche/gi, 'oyentes del confesionario')
+      .replace(/podcast nocturno/gi, 'podcast en directo');
+  } else if (timeInfo.saludo === 'Buenos días') {
+    scriptNarration = scriptNarration
+      .replace(/buenas noches/gi, 'buenos días')
+      .replace(/buenas tardes/gi, 'buenos días')
+      .replace(/esta noche/gi, 'esta mañana')
+      .replace(/esta tarde/gi, 'esta mañana')
+      .replace(/criaturas de la noche/gi, 'oyentes del confesionario')
+      .replace(/podcast nocturno/gi, 'podcast en directo');
   }
 
   console.log(`[Podcast] (${timeInfo.saludo}) Locutando Secreto #${secretId}: "${storyTitle}"...`);
@@ -125,5 +157,6 @@ Responde ÚNICAMENTE con un JSON válido sin formato markdown ni código:
 
 module.exports = {
   createPodcastStory,
-  getGreetingInfo
+  getGreetingInfo,
+  getLocalHour
 };
