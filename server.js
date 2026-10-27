@@ -10,6 +10,7 @@ require('dotenv').config();
 const tusecreto = require('./tusecreto');
 const podcastNarrator = require('./podcastNarrator');
 const tts = require('./tts');
+const { evaluateTikTokPolicy, sanitizeLiveComment } = require('./safetyFilter');
 
 if (process.env.EULER_API_KEY) {
   SignConfig.apiKey = process.env.EULER_API_KEY;
@@ -56,18 +57,28 @@ let podcastTimer = null;
 let preloadedNextStory = null;
 
 // Pre-cargar en background la siguiente historia
+function getRecentCommenters() {
+  return podcastState.recentComments.slice(-5).map(c => c.user).filter(Boolean);
+}
+
 async function preloadNextStory() {
   if (preloadedNextStory) return;
   try {
-    let secret = null;
-    if (podcastState.userSecretsQueue.length > 0) {
-      secret = podcastState.userSecretsQueue.shift();
-      console.log(`[Podcast] Cargando confesión enviada por oyente: @${secret.author}`);
-    } else {
-      secret = await tusecreto.getNextSecret();
+    let attempts = 0;
+    while (!preloadedNextStory && attempts < 5) {
+      attempts++;
+      let secret = null;
+      if (podcastState.userSecretsQueue.length > 0) {
+        secret = podcastState.userSecretsQueue.shift();
+        console.log(`[Podcast] Cargando confesión de oyente: @${secret.author || 'Anónimo'}`);
+      } else {
+        secret = await tusecreto.getNextSecret();
+      }
+      if (secret) {
+        preloadedNextStory = await podcastNarrator.createPodcastStory(secret, getRecentCommenters());
+      }
     }
-    if (secret) {
-      preloadedNextStory = await podcastNarrator.createPodcastStory(secret);
+    if (preloadedNextStory) {
       console.log(`[Podcast] Siguiente historia lista con audio: "${preloadedNextStory.title}"`);
     }
   } catch (e) {
@@ -82,16 +93,26 @@ async function nextPodcastStory() {
     story = preloadedNextStory;
     preloadedNextStory = null;
   } else {
-    let secret = null;
-    if (podcastState.userSecretsQueue.length > 0) {
-      secret = podcastState.userSecretsQueue.shift();
-    } else {
-      secret = await tusecreto.getNextSecret();
+    let attempts = 0;
+    while (!story && attempts < 5) {
+      attempts++;
+      let secret = null;
+      if (podcastState.userSecretsQueue.length > 0) {
+        secret = podcastState.userSecretsQueue.shift();
+      } else {
+        secret = await tusecreto.getNextSecret();
+      }
+      if (secret) {
+        story = await podcastNarrator.createPodcastStory(secret, getRecentCommenters());
+      }
     }
-    story = await podcastNarrator.createPodcastStory(secret);
   }
 
-  if (!story) return;
+  if (!story) {
+    console.warn('[Podcast] No se pudo obtener una historia segura en este intento. Reintentando en 4s...');
+    setTimeout(nextPodcastStory, 4000);
+    return;
+  }
 
   podcastState.currentStory = story;
   console.log(`[Podcast] 📖 Reproduciendo Historia #${story.orderNumber || 1} de ${story.totalStories || '?'}: "${story.title}"`);
@@ -130,6 +151,13 @@ function handleChatComment(userData, commentText) {
   if (clean.toLowerCase().startsWith('!secreto') || clean.toLowerCase().startsWith('#secreto')) {
     const secretContent = clean.replace(/^(!secreto|#secreto)\s*/i, '').trim();
     if (secretContent.length >= 15) {
+      // Filtrar contenido contra políticas de TikTok (menores, acoso, explícito)
+      const policyCheck = evaluateTikTokPolicy(secretContent);
+      if (!policyCheck.safe) {
+        console.warn(`[TikTok Safety] 🛡️ Secreto de oyente @${userData.nickname} rechazado: ${policyCheck.reason}`);
+        return;
+      }
+
       const isVip = vipDonors.has(userData.uniqueId);
       const secretItem = {
         id: 'user_' + Date.now(),
@@ -162,13 +190,19 @@ function handleChatComment(userData, commentText) {
     return;
   }
 
-  // 3. Comentario real de oyente para el muro de reflexiones
+  // 3. Comentario real de oyente para el muro de reflexiones (con filtro de groserías/ofensas)
+  const safeText = sanitizeLiveComment(clean);
+  if (!safeText) {
+    console.log(`[TikTok Safety] 🛡️ Comentario filtrado y ocultado de pantalla: "${clean}"`);
+    return;
+  }
+
   const commentObj = {
     id: Date.now() + Math.random().toString(),
     user: userData.nickname,
     uniqueId: userData.uniqueId,
     avatar: userData.profilePictureUrl,
-    text: clean,
+    text: safeText,
     timestamp: Date.now()
   };
 
@@ -290,6 +324,18 @@ io.on('connection', socket => {
 
   socket.on('admin:send_custom_story', async data => {
     if (!data || !data.text) return;
+
+    // Validación estricta contra Políticas de TikTok
+    const policyResult = evaluateTikTokPolicy(data.text, data.title || '');
+    if (!policyResult.safe) {
+      console.warn(`[TikTok Safety] 🚫 Rechazada historia propia de admin: ${policyResult.reason}`);
+      socket.emit('admin:story_rejected', {
+        title: data.title,
+        reason: policyResult.reason
+      });
+      return;
+    }
+
     const customSecret = {
       id: 'custom_' + Date.now(),
       realSecretId: '⭐',
@@ -302,7 +348,14 @@ io.on('connection', socket => {
     console.log(`[Admin] ✍️ Historia propia recibida: "${customSecret.title}" (Inmediata: ${data.immediate})`);
 
     if (data.immediate) {
-      const story = await podcastNarrator.createPodcastStory(customSecret);
+      const story = await podcastNarrator.createPodcastStory(customSecret, getRecentCommenters());
+      if (!story) {
+        socket.emit('admin:story_rejected', {
+          title: data.title,
+          reason: 'No superó los filtros de moderación para TikTok LIVE'
+        });
+        return;
+      }
       podcastState.currentStory = story;
       io.emit('new_podcast_story', story);
       io.emit('podcast_sync', getPublicPodcastState());
@@ -310,6 +363,7 @@ io.on('connection', socket => {
       podcastTimer = setTimeout(nextPodcastStory, 60000);
     } else {
       podcastState.userSecretsQueue.unshift(customSecret);
+      socket.emit('admin:story_queued', { title: customSecret.title });
     }
   });
 

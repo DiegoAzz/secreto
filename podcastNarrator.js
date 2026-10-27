@@ -1,5 +1,6 @@
 // podcastNarrator.js - Adaptador de historias a guion de Podcast sensual con Gemini y TTS
 const { generateSpeechAudio } = require('./tts');
+const { evaluateTikTokPolicy } = require('./safetyFilter');
 require('dotenv').config();
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
@@ -44,16 +45,28 @@ function getGreetingInfo() {
 }
 
 // Transforma una confesión anónima en un guion de podcast sensual, adictivo y magnético
-async function createPodcastStory(rawSecret) {
+async function createPodcastStory(rawSecret, recentCommenters = []) {
+  if (!rawSecret) return null;
   const storyText = rawSecret.text || rawSecret.previewText;
   const secretId = rawSecret.realSecretId || rawSecret.id || 1;
   const storyTitle = rawSecret.title && !rawSecret.title.startsWith('Secreto #') ? rawSecret.title : `Confesión #${secretId}`;
   const category = rawSecret.category || `🔥 SECRETO HISTÓRICO #${secretId}`;
   const timeInfo = getGreetingInfo();
 
+  // Verificación estricta de Políticas de TikTok antes de procesar
+  const preCheck = evaluateTikTokPolicy(storyText, storyTitle);
+  if (!preCheck.safe) {
+    console.warn(`[PodcastNarrator] 🛡️ Secreto #${secretId} descartado por Políticas de TikTok: ${preCheck.reason}`);
+    return null;
+  }
+
   let scriptNarration = '';
   let cleanDisplayText = storyText;
   let debateQuestion = '¿Qué hubieras hecho tú en su lugar? Los leo en el chat 👇';
+
+  const listenersMention = (recentCommenters && recentCommenters.length > 0)
+    ? `OYENTES COMENTANDO EN VIVO AHORA: ${recentCommenters.slice(0, 3).map(u => '@' + u).join(', ')}. Haz un saludo o guiño sutil a uno de ellos ("un abrazo a @${recentCommenters[0]} que está aquí en vivo...") para demostrar interacción 100% en tiempo real.`
+    : '';
 
   if (GEMINI_API_KEY) {
     const prompt = `
@@ -62,6 +75,14 @@ Estamos en la GRAN MARATÓN: Leyendo los secretos de TuSecreto.me desde el SECRE
 
 ESTE ES EL SECRETO NÚMERO: #${secretId}
 HORA ACTUAL Y SALUDO OBLIGATORIO: ${timeInfo.regla}
+${listenersMention}
+
+NORMAS DE SEGURIDAD ESTRICTAS DE TIKTOK LIVE (CUMPLIMIENTO OBLIGATORIO):
+1. CERO TOLERANCIA a historias que involucren menores de 18 años, pedofilia, colegios/alumnos menores o grooming. Si detectas esto, responde ÚNICAMENTE: {"isSafe": false}
+2. CERO TOLERANCIA a violencia sexual, abuso, violación, tocamientos forzados, sumisión química (drogar bebidas) o chantaje íntimo (sextorsión). Si detectas esto, responde ÚNICAMENTE: {"isSafe": false}
+3. CERO TOLERANCIA a suicidio o autolesiones. Si detectas esto, responde ÚNICAMENTE: {"isSafe": false}
+4. CONTENIDO ORIGINAL E INTERACTIVO: Este programa es un podcast transmitido EN VIVO. Demuestra interacción genuina con la audiencia.
+5. ADAPTACIÓN PARA TRANSMISIÓN: Abordamos el amor, la traición, el desamor, los celos o la pasión íntima con lenguaje seductor, elegante, sugerente y maduro. ESTÁ PROHIBIDO usar palabras anatómicas explícitas de genitales o pornografía cruda para no activar los filtros automáticos de audio y OCR de TikTok.
 
 Tu objetivo es hacer que los espectadores de TikTok Live se queden hipnotizados escuchando.
 Escribe:
@@ -69,7 +90,7 @@ Escribe:
    - Comienza mencionando el número del secreto y el saludo adecuado al horario ("${timeInfo.saludo}, bienvenidos a la gran maratón... Secreto número ${secretId}...").
    - Cuenta la confesión en primera persona con emoción palpable, suspenso y ritmo envolvente. Corrige cualquier falta ortográfica o abreviatura para que la dicción sea perfecta.
    - Termina con una pregunta psicológica irresistible que obligue al chat a comentar de inmediato.
-2. "cleanText": El texto de la confesión bien redactado y cautivador para la pantalla del celular (máximo 250 caracteres).
+2. "cleanText": El texto de la confesión bien redactado y cautivador para la pantalla del celular (máximo 250 caracteres, sin palabras vulgares).
 3. "debateQuestion": Una pregunta provocadora y directa para el chat (máximo 85 caracteres).
 
 CONFESIÓN ORIGINAL #${secretId}:
@@ -77,6 +98,7 @@ CONFESIÓN ORIGINAL #${secretId}:
 
 Responde ÚNICAMENTE con un JSON válido sin formato markdown ni código:
 {
+  "isSafe": true,
   "narration": "Guion completo listo para locutar en voz alta (entre 45 y 75 palabras)",
   "cleanText": "Texto limpio y emocionante para la pantalla",
   "debateQuestion": "Pregunta de debate psicológico para el chat"
@@ -106,6 +128,10 @@ Responde ÚNICAMENTE con un JSON válido sin formato markdown ni código:
             clean = clean.replace(/^```[a-z]*\n/, '').replace(/\n```$/, '').trim();
           }
           const parsed = JSON.parse(clean);
+          if (parsed.isSafe === false) {
+            console.warn(`[PodcastNarrator] 🛡️ Gemini determinó que la historia #${secretId} infringe políticas de TikTok.`);
+            return null;
+          }
           if (parsed.narration) scriptNarration = parsed.narration;
           if (parsed.cleanText) cleanDisplayText = parsed.cleanText;
           if (parsed.debateQuestion) debateQuestion = parsed.debateQuestion;
@@ -136,6 +162,13 @@ Responde ÚNICAMENTE con un JSON válido sin formato markdown ni código:
       .replace(/esta tarde/gi, 'esta mañana')
       .replace(/criaturas de la noche/gi, 'oyentes del confesionario')
       .replace(/podcast nocturno/gi, 'podcast en directo');
+  }
+
+  // Verificación final del guion antes de mandarlo a Edge TTS
+  const postCheck = evaluateTikTokPolicy(scriptNarration);
+  if (!postCheck.safe) {
+    console.warn(`[PodcastNarrator] 🛡️ Guion final descartado por contener términos no permitidos: ${postCheck.reason}`);
+    return null;
   }
 
   console.log(`[Podcast] (${timeInfo.saludo}) Locutando Secreto #${secretId}: "${storyTitle}"...`);

@@ -166,6 +166,34 @@ body.podcast-theme {
   text-shadow: 0 0 10px rgba(255, 0, 127, 0.4);
 }
 
+.brand-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.live-clock-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(0, 245, 212, 0.12);
+  border: 1px solid rgba(0, 245, 212, 0.4);
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-family: monospace;
+}
+
+.clock-icon {
+  font-size: 0.72rem;
+}
+
+.clock-time {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #00f5d4;
+  letter-spacing: 0.5px;
+}
+
 .sound-toggle-btn {
   background: rgba(157, 78, 221, 0.25);
   border: 1px solid var(--purple);

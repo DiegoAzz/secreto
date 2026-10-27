@@ -259,6 +259,14 @@
       }
     });
 
+    socket.on('admin:story_rejected', data => {
+      const notice = document.getElementById('customStoryNotice');
+      notice.style.display = 'block';
+      notice.style.color = '#ff0055';
+      notice.textContent = `🚫 Historia rechazada por políticas de TikTok: ${data.reason}`;
+      setTimeout(() => { notice.style.display = 'none'; notice.style.color = '#00ff88'; }, 7000);
+    });
+
     socket.on('podcast_sync', state => {
       if (state.tiktokConnected) {
         document.getElementById('tiktokBadge').className = 'badge badge-online';

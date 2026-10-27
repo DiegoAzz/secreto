@@ -1,6 +1,7 @@
 // tusecreto.js - Extractor con persistencia en disco y soporte de fallback
 const fs = require('fs');
 const path = require('path');
+const { evaluateTikTokPolicy } = require('./safetyFilter');
 
 const CACHE_FILE = path.join(__dirname, 'secrets_chronological_cache.json');
 const PROGRESS_FILE = path.join(__dirname, 'marathon_progress.json');
@@ -188,39 +189,56 @@ async function getNextSecret() {
 
   if (storiesList.length === 0) return null;
 
-  if (currentIndex >= storiesList.length) {
-    console.log(`[TuSecreto] 🏁 Se leyeron todas las ${storiesList.length} historias. Reiniciando ciclo desde la #1...`);
-    currentIndex = 0;
-  }
+  let safeStory = null;
+  let attempts = 0;
+  const maxAttempts = storiesList.length;
 
-  const chosen = storiesList[currentIndex];
-  const orderNumber = currentIndex + 1;
-  const totalCount = 19934;
-
-  // Avanzar índice y guardar persistencia en disco de inmediato
-  currentIndex++;
-  saveProgress(currentIndex);
-
-  let fullText = chosen.text;
-  if (chosen.link && (!chosen.fullText || chosen.fullText.length < chosen.text.length)) {
-    const fetched = await fetchFullStoryText(chosen.link);
-    if (fetched && fetched.length >= chosen.text.length) {
-      fullText = fetched;
-      chosen.fullText = fetched;
-      chosen.text = fetched;
+  while (!safeStory && attempts < maxAttempts) {
+    attempts++;
+    if (currentIndex >= storiesList.length) {
+      console.log(`[TuSecreto] 🏁 Se leyeron todas las ${storiesList.length} historias. Reiniciando ciclo desde la #1...`);
+      currentIndex = 0;
     }
+
+    const chosen = storiesList[currentIndex];
+    const orderNumber = currentIndex + 1;
+    const totalCount = 19934;
+
+    // Avanzar índice y guardar persistencia en disco de inmediato
+    currentIndex++;
+    saveProgress(currentIndex);
+
+    let fullText = chosen.text;
+    if (chosen.link && (!chosen.fullText || chosen.fullText.length < chosen.text.length)) {
+      const fetched = await fetchFullStoryText(chosen.link);
+      if (fetched && fetched.length >= chosen.text.length) {
+        fullText = fetched;
+        chosen.fullText = fetched;
+        chosen.text = fetched;
+      }
+    }
+
+    const checkText = fullText || chosen.text;
+    const policyResult = evaluateTikTokPolicy(checkText, chosen.title || '');
+
+    if (!policyResult.safe) {
+      console.warn(`[TikTok Safety] 🛡️ Secreto #${chosen.id} omitido por Políticas de TikTok: ${policyResult.reason}`);
+      continue;
+    }
+
+    safeStory = {
+      id: chosen.id,
+      orderNumber: orderNumber,
+      realSecretId: chosen.id,
+      totalStories: totalCount,
+      title: chosen.title || `Secreto Histórico #${chosen.id}`,
+      category: `🔥 MARATÓN: SECRETO #${chosen.id}`,
+      text: checkText,
+      link: chosen.link
+    };
   }
 
-  return {
-    id: chosen.id,
-    orderNumber: orderNumber,
-    realSecretId: chosen.id,
-    totalStories: totalCount,
-    title: chosen.title || `Secreto Histórico #${chosen.id}`,
-    category: `🔥 MARATÓN: SECRETO #${chosen.id}`,
-    text: fullText || chosen.text,
-    link: chosen.link
-  };
+  return safeStory;
 }
 
 module.exports = {

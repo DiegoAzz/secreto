@@ -16,6 +16,27 @@ const soundToggleBtnEl = document.getElementById('soundToggleBtn');
 const roseCountEl = document.getElementById('roseCount');
 const roseGoalEl = document.getElementById('roseGoal');
 const goalProgressBarEl = document.getElementById('goalProgressBar');
+const liveClockEl = document.getElementById('liveClock');
+
+// Reloj digital en vivo en pantalla (prueba anti-bucle ante algoritmos de TikTok)
+function updateLiveClock() {
+  if (!liveClockEl) return;
+  const now = new Date();
+  try {
+    const timeStr = now.toLocaleTimeString('es-CO', {
+      timeZone: 'America/Bogota',
+      hour12: true,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+    liveClockEl.textContent = timeStr;
+  } catch (e) {
+    liveClockEl.textContent = now.toTimeString().split(' ')[0];
+  }
+}
+setInterval(updateLiveClock, 1000);
+updateLiveClock();
 
 function updateGoalUI(goalData) {
   if (!goalData) return;
